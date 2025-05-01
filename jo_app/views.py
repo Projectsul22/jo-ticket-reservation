@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import FormulaireInscription, FormulaireConnexion
 
@@ -11,7 +12,7 @@ def inscription(request):
             utilisateur = form.save()
             login(request, utilisateur)
             messages.success(request, "Inscription réussie !")
-            return redirect('accueil')  # à créer plus tard
+            return redirect('accueil')  
     else:
         form = FormulaireInscription()
     return render(request, 'jo_app/inscription.html', {'form': form})
@@ -24,10 +25,14 @@ def connexion_utilisateur(request):
             utilisateur = form.get_user()
             login(request, utilisateur)
             messages.success(request, "Connexion réussie !")
-            return redirect('accueil')  # à créer plus tard
+            return redirect('accueil')  
     else:
         form = FormulaireConnexion()
     return render(request, 'jo_app/connexion.html', {'form': form})
+
+@login_required
+def accueil(request):
+    return render(request, 'jo_app/accueil.html')
 
 # DÉCONNEXION
 def deconnexion_utilisateur(request):
