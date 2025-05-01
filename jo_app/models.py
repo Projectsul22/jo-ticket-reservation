@@ -23,9 +23,10 @@ class Utilisateur(AbstractUser):
 class Offre(models.Model):
     nom_offre = models.CharField(max_length=50)  # ex : solo, duo, familiale
     nombre_places = models.PositiveIntegerField()
+    prix = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)  # <-- nouveau champ
 
     def __str__(self):
-        return f"{self.nom_offre} ({self.nombre_places} places)"
+        return f"{self.nom_offre} ({self.nombre_places} places - {self.prix}€)"
 
 
 # ---------------------------

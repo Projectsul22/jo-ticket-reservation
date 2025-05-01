@@ -34,6 +34,14 @@ def connexion_utilisateur(request):
 def accueil(request):
     return render(request, 'jo_app/accueil.html')
 
+def offres(request):
+    offres_fictives = [
+        {'nom': 'Offre Solo', 'places': 1, 'prix': 50},
+        {'nom': 'Offre Duo', 'places': 2, 'prix': 90},
+        {'nom': 'Offre Familiale', 'places': 4, 'prix': 160},
+    ]
+    return render(request, 'jo_app/offres.html', {'offres': offres_fictives})
+
 # DÉCONNEXION
 def deconnexion_utilisateur(request):
     logout(request)
