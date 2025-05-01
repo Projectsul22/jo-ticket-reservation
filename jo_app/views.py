@@ -30,7 +30,7 @@ def connexion_utilisateur(request):
         form = FormulaireConnexion()
     return render(request, 'jo_app/connexion.html', {'form': form})
 
-@login_required
+
 def accueil(request):
     return render(request, 'jo_app/accueil.html')
 
