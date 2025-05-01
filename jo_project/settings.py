@@ -49,6 +49,11 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'jo_app.Utilisateur'
 
+
+LOGIN_URL = '/connexion/' 
+
+LOGIN_REDIRECT_URL = '/offres/'
+
 MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
