@@ -1,0 +1,12 @@
+{% extends 'jo_app/base.html' %}
+{% block title %}Billet{% endblock %}
+{% block content %}
+<div class="text-center mt-10">
+    <h2 class="text-2xl font-bold mb-4">🎫 Votre e-billet</h2>
+    <p>Offre : {{ billet.reservation.offre.nom_offre }}</p>
+    <p>Places : {{ billet.reservation.offre.nombre_places }}</p>
+    <p>Montant payé : {{ billet.reservation.montant }} €</p>
+    <img src="data:image/png;base64,{{ billet.code_qr }}" alt="QR Code" class="mx-auto mt-4 w-48 h-48">
+    <p class="mt-4 text-gray-600 text-sm">À présenter lors de l'entrée aux Jeux Olympiques.</p>
+</div>
+{% endblock %}
