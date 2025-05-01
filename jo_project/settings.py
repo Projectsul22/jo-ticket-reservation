@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'jo_app',
+    'widget_tweaks',
 ]
 
 AUTH_USER_MODEL = 'jo_app.Utilisateur'
