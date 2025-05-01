@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import uuid
+import random
+import string
 
 # Create your models here.
 
@@ -39,7 +41,17 @@ class Reservation(models.Model):
     date_reservation = models.DateTimeField(auto_now_add=True)
     montant = models.DecimalField(max_digits=8, decimal_places=2)
     statut_paiement = models.BooleanField(default=False)  # True si payé
+    reference = models.CharField(max_length=100, unique=True, default=uuid.uuid4, editable=False)
 
+
+
+    def save(self, *args, **kwargs):
+        if not self.reference:
+            self.reference = self._generate_reference()
+        super().save(*args, **kwargs)
+
+    def _generate_reference(self):
+        return 'RES-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
     def __str__(self):
         return f"Réservation #{self.id} - {self.utilisateur}"
 
