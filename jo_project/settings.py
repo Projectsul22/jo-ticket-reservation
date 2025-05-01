@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'jo_app',
 ]
+
+AUTH_USER_MODEL = 'jo_app.Utilisateur'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -77,7 +80,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'jo_db',
         'USER': 'postgres',
-        'PASSWORD': 'motdepasse',
+        'PASSWORD': 'root',
         'HOST': 'localhost',
         'PORT': '5432',
     }

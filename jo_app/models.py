@@ -1,3 +1,56 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+import uuid
 
 # Create your models here.
+
+# ---------------------------
+# UTILISATEUR PERSONNALISÉ
+# ---------------------------
+
+class Utilisateur(AbstractUser):
+    cle_reservation = models.UUIDField(default=uuid.uuid4, editable=False)
+    cle_paiement = models.UUIDField(default=uuid.uuid4, editable=False)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
+
+# ---------------------------
+# OFFRE
+# ---------------------------
+
+class Offre(models.Model):
+    nom_offre = models.CharField(max_length=50)  # ex : solo, duo, familiale
+    nombre_places = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.nom_offre} ({self.nombre_places} places)"
+
+
+# ---------------------------
+# RÉSERVATION
+# ---------------------------
+
+class Reservation(models.Model):
+    utilisateur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name='reservations')
+    offre = models.ForeignKey(Offre, on_delete=models.PROTECT)
+    date_reservation = models.DateTimeField(auto_now_add=True)
+    montant = models.DecimalField(max_digits=8, decimal_places=2)
+    statut_paiement = models.BooleanField(default=False)  # True si payé
+
+    def __str__(self):
+        return f"Réservation #{self.id} - {self.utilisateur}"
+
+
+# ---------------------------
+# BILLET
+# ---------------------------
+
+class Billet(models.Model):
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name='billets')
+    code_qr = models.TextField()
+    cle_billet = models.UUIDField(default=uuid.uuid4, editable=False)
+
+    def __str__(self):
+        return f"Billet #{self.id} - Réservation {self.reservation.id}"
