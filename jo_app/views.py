@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -39,6 +39,13 @@ def accueil(request):
 def offres(request):
     offres = Offre.objects.all()
     return render(request, 'jo_app/offres.html', {'offres': offres})
+
+
+@login_required
+def reserver_offre(request, offre_id):
+    offre = get_object_or_404(Offre, id=offre_id)
+    # Ici on peut créer une réservation temporaire, ou afficher les détails à confirmer
+    return render(request, 'jo_app/reservation.html', {'offre': offre})
 
 # DÉCONNEXION
 def deconnexion_utilisateur(request):
