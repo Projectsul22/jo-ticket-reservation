@@ -1,3 +1,4 @@
+from PIL import Image as PILImage
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -9,6 +10,11 @@ import uuid
 import qrcode
 from io import BytesIO
 import base64
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from django.http import HttpResponse
+from django.http import FileResponse
+import io
 
 # INSCRIPTION
 def inscription(request):
@@ -48,42 +54,88 @@ def offres(request):
 @login_required
 def reserver_offre(request, offre_id):
     offre = get_object_or_404(Offre, id=offre_id)
-    # Ici on peut créer une réservation temporaire, ou afficher les détails à confirmer
+
+    if request.method == 'POST':
+        reservation = Reservation.objects.create(
+            utilisateur=request.user,
+            offre=offre,
+            montant=offre.prix,
+            statut_paiement=False  # à true plus tard si paiement simulé
+        )
+        return redirect('payer_reservation', reservation_id=reservation.id)
+
     return render(request, 'jo_app/reservation.html', {'offre': offre})
+
 
 
 @login_required
 def payer_reservation(request, reservation_id):
     reservation = get_object_or_404(Reservation, id=reservation_id, utilisateur=request.user)
 
-    # Vérifie si déjà payé
-    if reservation.statut_paiement:
-        return render(request, 'jo_app/billet.html', {'billet': reservation.billets.first()})
+    if request.method == 'POST' and not reservation.statut_paiement:
+        reservation.statut_paiement = True
+        reservation.save()
 
-    # Génère une clé de paiement unique
-    request.user.cle_paiement = uuid.uuid4()
-    request.user.save()
+        # Générer la clé de sécurité
+        cle_secrete = str(reservation.utilisateur.cle_reservation) + str(reservation.utilisateur.cle_paiement)
 
-    reservation.statut_paiement = True
-    reservation.montant = reservation.offre.prix
-    reservation.save()
+        # Générer le QR Code
+        qr = qrcode.make(cle_secrete)
+        buffer = BytesIO()
+        qr.save(buffer, format="PNG")
+        img_base64 = base64.b64encode(buffer.getvalue()).decode()
 
-    # Clé définitive = cle_reservation + cle_paiement
-    cle_billet = str(request.user.cle_reservation) + str(request.user.cle_paiement)
+        # Enregistrer le billet
+        Billet.objects.create(
+            reservation=reservation,
+            code_qr=img_base64
+        )
 
-    # Génère le QR code
-    qr = qrcode.make(cle_billet)
-    buffer = BytesIO()
-    qr.save(buffer, format='PNG')
-    image_base64 = base64.b64encode(buffer.getvalue()).decode()
+        return redirect('qr_code', reservation_id=reservation.id)
 
-    billet = Billet.objects.create(
-        reservation=reservation,
-        cle_billet=uuid.uuid4(),
-        code_qr=image_base64
-    )
+    return render(request, 'jo_app/paiement.html', {'reservation': reservation})
 
-    return render(request, 'jo_app/billet.html', {'billet': billet})
+@login_required
+def qr_code(request, reservation_id):
+    reservation = get_object_or_404(Reservation, id=reservation_id, utilisateur=request.user)
+    billet = reservation.billets.first()
+    return render(request, 'jo_app/qr_code.html', {'billet': billet})
+
+@login_required
+def mes_billets(request):
+    billets = Billet.objects.filter(reservation__utilisateur=request.user)
+    return render(request, 'jo_app/mes_billets.html', {'billets': billets})
+
+
+@login_required
+def telecharger_billet(request, billet_id):
+    billet = get_object_or_404(Billet, id=billet_id, reservation__utilisateur=request.user)
+
+    # Générer le QR code à partir de la clef sécurisée
+    cle_complete = f"{billet.reservation.utilisateur.cle_reservation}{billet.reservation.utilisateur.cle_paiement}"
+    qr_img = qrcode.make(cle_complete)
+    qr_img_pil = qr_img.convert("RGB")  # Convertir en image RGB compatible
+
+    # Générer le PDF avec ReportLab
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=A4)
+
+    # Texte
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(200, 770, "🎫 Billet pour les JO 2024")
+    p.setFont("Helvetica", 12)
+    p.drawString(100, 730, f"Nom : {billet.reservation.utilisateur.first_name} {billet.reservation.utilisateur.last_name}")
+    p.drawString(100, 710, f"Offre : {billet.reservation.offre.nom_offre}")
+    p.drawString(100, 690, f"Nombre de places : {billet.reservation.offre.nombre_places}")
+
+    # ✅ Intégrer le QR code depuis l'image PIL
+    p.drawInlineImage(qr_img_pil, 100, 500, width=150, height=150)
+
+    p.showPage()
+    p.save()
+
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename='billet_jo2024.pdf')
 
 # DÉCONNEXION
 def deconnexion_utilisateur(request):

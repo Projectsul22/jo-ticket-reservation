@@ -1,0 +1,12 @@
+{% extends 'jo_app/base.html' %}
+{% block title %}Paiement{% endblock %}
+{% block content %}
+<div class="text-center mt-10">
+    <h2 class="text-2xl font-bold mb-4">Paiement de votre réservation</h2>
+    <p>Montant à régler : <strong>{{ reservation.montant }} €</strong></p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="mt-4 px-4 py-2 bg-green-600 text-white rounded">Payer</button>
+    </form>
+</div>
+{% endblock %}

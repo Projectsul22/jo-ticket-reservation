@@ -1,0 +1,9 @@
+{% extends 'jo_app/base.html' %}
+{% block title %}Paiement confirmé{% endblock %}
+{% block content %}
+<div class="text-center mt-10">
+    <h2 class="text-2xl font-bold mb-4 text-green-600">Paiement confirmé ✅</h2>
+    <p>Merci pour votre réservation !</p>
+    <p>Votre réservation n°{{ reservation.id }} a été prise en compte.</p>
+</div>
+{% endblock %}

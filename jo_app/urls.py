@@ -9,7 +9,13 @@ urlpatterns = [
     path('accueil/', views.accueil, name='accueil'),
     path('offres/', views.offres, name='offres'),
     path('reserver/<int:offre_id>/', views.reserver_offre, name='reserver_offre'),
-    path('payer/<int:reservation_id>/', views.payer_reservation, name='payer'),
+    path('payer/<int:reservation_id>/', views.payer_reservation, name='payer_reservation'),
+    path('qr/<int:reservation_id>/', views.qr_code, name='qr_code'),
+    path('mes-billets/', views.mes_billets, name='mes_billets'),
+    path('telecharger-billet/<int:billet_id>/', views.telecharger_billet, name='telecharger_billet'),
+    path('billets/<int:billet_id>/telecharger/', views.telecharger_billet, name='telecharger_billet'),
+
+
 
     path('deconnexion/', views.deconnexion_utilisateur, name='deconnexion'),
 ]
