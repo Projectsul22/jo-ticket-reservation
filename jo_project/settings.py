@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'jo_app',
 ]
 
-AUTH_USER_MODEL = 'jo_app.utilisateur'
+AUTH_USER_MODEL = 'jo_app.Utilisateur'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -57,7 +57,7 @@ ROOT_URLCONF = 'jo_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'jo_app' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
