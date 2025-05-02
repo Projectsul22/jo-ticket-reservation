@@ -3,36 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}JO 2024{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
 </head>
-<body>
-    <header>
-        <h1>Réservation JO 2024</h1>
-        <nav>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <header class="bg-blue-600 text-white shadow">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold">🏅 JO 2024</h1>
+            <nav class="space-x-4">
                 {% if user.is_authenticated %}
-                    <span>Bienvenue, {{ user.first_name }} {{ user.last_name }}</span> |
-                    <a href="{% url 'mes_billets' %}">Mes billets</a> |
-                    <a href="{% url 'deconnexion' %}">Déconnexion</a>
+                    <span>Bienvenue, {{ user.first_name }} {{ user.last_name }}</span>
+                    <a href="{% url 'mes_billets' %}" class="hover:underline">Mes billets</a>
+                    <a href="{% url 'deconnexion' %}" class="hover:underline">Déconnexion</a>
                 {% else %}
-                    <a href="{% url 'inscription' %}">Inscription</a> |
-                    <a href="{% url 'connexion' %}">Connexion</a>
+                    <a href="{% url 'inscription' %}" class="bg-white text-blue-600 px-3 py-1 rounded hover:bg-gray-100">Inscription</a>
+                    <a href="{% url 'connexion' %}" class="bg-white text-blue-600 px-3 py-1 rounded hover:bg-gray-100">Connexion</a>
                 {% endif %}
-        
-        </nav>
-        <hr>
+            </nav>
+        </div>
     </header>
 
+    <!-- Messages -->
     {% if messages %}
-        <ul>
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
+        <div class="container mx-auto px-6 py-4">
+            {% for message in messages %}
+                <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-2">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
     {% endif %}
 
-    <main>
+    <!-- Main content -->
+    <main class="flex-grow">
         {% block content %}{% endblock %}
     </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center py-4 mt-8">
+        © 2024 Billetterie JO Paris – Tous droits réservés • <a href="#" class="underline">Mentions légales</a>
+    </footer>
+
 </body>
 </html>
